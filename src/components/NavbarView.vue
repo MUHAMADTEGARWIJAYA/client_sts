@@ -5,7 +5,7 @@
         Say To Someone
       </router-link>
 
-      <div class="w-full">
+      <div class="w-full flex justify-end">
         <router-link to="/" :class="{
           'text-[#131010] bg-white ': $route.path === '/',
           'text-indigo-200 hover:text-white': $route.path !== '/'
