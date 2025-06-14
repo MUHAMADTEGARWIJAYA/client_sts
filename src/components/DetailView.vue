@@ -16,7 +16,7 @@
 
     <div v-else-if="message"
       class="w-full max-w-4xl bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
-      <div class="p-6 md:p-8 flex flex-col" id="message-content">
+      <div class="p-6 md:p-8 flex flex-col" id="message-content-visible">
         <div class="flex flex-col md:flex-row gap-8">
           <div class="md:w-1/3 flex flex-col items-center">
             <img :src="message.cover || 'https://via.placeholder.com/600/000000/FFFFFF?text=No+Cover'"
@@ -39,18 +39,14 @@
                   <p>Hello <span class="font-semibold italic">{{ message.to }}</span>, someone sent you this song along
                     with a heartfelt message — hoping it brings a smile to your day :)</p>
                 </div>
-
-
               </div>
 
-              <div class=" p-5 rounded  mb-6">
+              <div class="p-5 rounded mb-6">
                 <p class="text-gray-800 text-2xl leading-relaxed handwritten">{{ message.pesan }}</p>
               </div>
 
               <p class="text-xs text-gray-400 text-right">Sent on: {{ formatDate(message.createdAt) }}</p>
             </div>
-
-
           </div>
         </div>
       </div>
@@ -59,17 +55,6 @@
           class="flex items-center gap-2 bg-black text-white py-2 px-5 rounded text-sm font-medium hover:bg-gray-800 transition-colors">
           <i class="fab fa-spotify"></i> Play on Spotify
         </a>
-
-        <!-- <button @click="shareToTwitter"
-                class="flex items-center gap-2 bg-gray-100 text-gray-800 py-2 px-5 rounded text-sm font-medium hover:bg-gray-200 transition-colors">
-                <i class="fab fa-twitter text-blue-400"></i> Share
-              </button>
-
-              <button @click="shareToWhatsApp"
-                class="flex items-center gap-2 bg-gray-100 text-gray-800 py-2 px-5 rounded text-sm font-medium hover:bg-gray-200 transition-colors">
-                <i class="fab fa-whatsapp text-green-500"></i> Share
-              </button> -->
-
         <button @click="downloadMessageAsImage"
           class="flex items-center gap-2 bg-gray-100 text-gray-800 py-2 px-5 rounded text-sm font-medium hover:bg-gray-200 transition-colors">
           <i class="fas fa-download"></i> Download as Image
@@ -98,8 +83,8 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import dayjs from 'dayjs';
-import html2canvas from 'html2canvas'; // Import html2canvas
-import { saveAs } from 'file-saver'; // Already there, but still needed for saveAs
+import html2canvas from 'html2canvas';
+import { saveAs } from 'file-saver';
 
 export default {
   name: 'MessageDetail',
@@ -117,8 +102,7 @@ export default {
         const response = await axios.get(`https://server-sts.vercel.app/song/message/${messageId}`);
         message.value = response.data.data;
 
-        // Corrected Spotify iframe URL - it should be https://open.spotify.com/embed/track/
-        // And the spotify_id should be extracted from the spotify_url if available.
+        // Corrected Spotify iframe URL: Get spotify_id from spotify_url
         if (message.value.spotify_url && !message.value.spotify_id) {
           const spotifyRegex = /(?:spotify:track:|https:\/\/open\.spotify\.com\/track\/)([a-zA-Z0-9]+)/;
           const match = message.value.spotify_url.match(spotifyRegex);
@@ -129,8 +113,8 @@ export default {
       } catch (err) {
         console.error('Error fetching message:', err);
         error.value = err.response?.status === 404
-          ? 'Message not found.'
-          : 'Failed to load message. Please try again later.';
+          ? 'Pesan tidak ditemukan.'
+          : 'Gagal memuat pesan. Silakan coba lagi nanti.';
       } finally {
         isLoading.value = false;
       }
@@ -141,57 +125,70 @@ export default {
       return dayjs(dateString).format('MMMM D, YYYY [at] h:mm A');
     };
 
-    const shareToTwitter = () => {
-      const text = `Check out this song message: ${message.value.title} by ${message.value.artist}`;
-      const url = window.location.href;
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
-    };
-
-    const shareToWhatsApp = () => {
-      const text = `Check out this song message: ${message.value.title} by ${message.value.artist}\n${window.location.href}`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-    };
+    // Fungsi shareToTwitter dan shareToWhatsApp tidak ada di template HTML Anda,
+    // jadi saya tidak menyertakannya lagi di sini untuk menjaga konsistensi.
+    // Jika Anda ingin menggunakannya, tambahkan kembali tombolnya di template.
 
     const copyLink = async () => {
       try {
         await navigator.clipboard.writeText(window.location.href);
-        alert('Link copied to clipboard!');
+        alert('Link berhasil disalin ke clipboard!');
       } catch (err) {
         console.error('Failed to copy link:', err);
-        alert('Failed to copy link');
+        alert('Gagal menyalin link.');
       }
     };
 
     const downloadMessageAsImage = async () => {
-      // Get the element you want to convert to an image.
-      // We've added an ID "message-content" to the main message container div.
-      const messageContent = document.getElementById('message-content');
+      const visibleContent = document.getElementById('message-content-visible');
 
-      if (!messageContent) {
-        console.error('Message content element not found!');
-        alert('Could not find content to download.');
+      if (!visibleContent) {
+        console.error('Elemen konten pesan tidak ditemukan!');
+        alert('Tidak dapat menemukan konten untuk diunduh.');
         return;
       }
 
+      // 1. Buat klon dari elemen konten yang terlihat
+      const clonedContent = visibleContent.cloneNode(true);
+
+      // 2. Tentukan lebar tetap untuk klon (misalnya, lebar desktop yang Anda inginkan)
+      //    Ini akan membuat html2canvas merender pada lebar ini, terlepas dari viewport
+      const targetWidth = 800; // Lebar standar yang diinginkan untuk gambar (sesuaikan)
+      clonedContent.style.width = `${targetWidth}px`;
+      clonedContent.style.maxWidth = `${targetWidth}px`; // Pastikan tidak melebihi
+
+      // 3. Atur posisi klon di luar layar agar tidak terlihat pengguna
+      clonedContent.style.position = 'absolute';
+      clonedContent.style.top = '-9999px';
+      clonedContent.style.left = '-9999px';
+      clonedContent.style.background = '#ffffff'; // Pastikan background putih
+
+      // 4. Tambahkan klon ke body atau elemen induk lainnya
+      document.body.appendChild(clonedContent);
+
       try {
-        // Use html2canvas to render the div as a canvas
-        const canvas = await html2canvas(messageContent, {
-          scale: 2, // Increase scale for better resolution
-          useCORS: true, // Important for loading images from different origins (like Spotify cover)
-          backgroundColor: '#ffffff', // Set a background color for the canvas
+        // 5. Render klon menggunakan html2canvas
+        const canvas = await html2canvas(clonedContent, {
+          scale: 2, // Meningkatkan skala untuk resolusi gambar yang lebih baik (misal 2x atau 3x)
+          useCORS: true, // Penting untuk memuat gambar dari domain berbeda (misal cover Spotify)
+          backgroundColor: '#ffffff', // Atur warna latar belakang kanvas
         });
 
-        // Convert the canvas to a data URL (PNG format)
+        // 6. Konversi kanvas ke URL data (format PNG)
         const imageDataUrl = canvas.toDataURL('image/png');
 
-        // Use file-saver to download the image
-        saveAs(imageDataUrl, `song-message-${message.value.title}.png`);
+        // 7. Gunakan file-saver untuk mengunduh gambar
+        saveAs(imageDataUrl, `song-message-${message.value.title.replace(/\s/g, '-')}.png`);
 
       } catch (err) {
         console.error('Error downloading message as image:', err);
-        alert('Failed to download message as an image. Please try again.');
+        alert('Gagal mengunduh pesan sebagai gambar. Silakan coba lagi.');
+      } finally {
+        // 8. Hapus klon dari DOM setelah selesai
+        document.body.removeChild(clonedContent);
       }
     };
+
 
     onMounted(() => {
       fetchMessage();
@@ -202,10 +199,8 @@ export default {
       isLoading,
       error,
       formatDate,
-      shareToTwitter,
-      shareToWhatsApp,
       copyLink,
-      downloadMessageAsImage, // Changed function name to reflect image download
+      downloadMessageAsImage,
     };
   },
 };
@@ -213,7 +208,7 @@ export default {
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap');
 
 
 /* Minimalist scrollbar */
