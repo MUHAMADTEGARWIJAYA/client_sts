@@ -42,7 +42,7 @@
 
       <section class="mb-28">
         <h2 class="text-3xl font-bold text-center mb-16 text-white">
-          <span class="border-b-4 border-cyan-400 pb-2">Fitur Utama</span>
+          <span class="border-b-4 border-cyan-400 pb-2">Welcome to Sts</span>
         </h2>
 
         <div class="grid md:grid-cols-3 gap-8">
@@ -122,17 +122,17 @@ export default {
       {
         title: 'Kirim Pesan',
         description: 'Kirim pesan tulus dengan lagu favoritmu kepada seseorang yang spesial.',
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0v9l-9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg>'
+
       },
       {
         title: 'Cari Pesan',
         description: 'Kamu bisa menemukan pesan yang ditujukan untukmu dari seseorang yang kamu kenal.',
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0M3.75 18H7.5m3-6h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0M3.75 12H7.5" /></svg>'
+
       },
       {
         title: 'Bagikan ke Medsos',
         description: 'Tap pada salah satu pesan lalu tap ikon share untuk membagikan ke sosial media kesukaanmu.',
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186A2.25 2.25 0 015.124 15.15c-.868.23-1.761.52-2.657.879.145.39.297.779.458 1.162A12.067 12.067 0 007.217 21a2.25 2.25 0 100-2.186m0-2.186c1.393 0 2.524-.764 2.524-2.186s-1.131-2.186-2.524-2.186M12 1.5c-3.243 0-6.148 1.458-8.06 3.75c1.413-.574 2.871-.977 4.381-1.218C10.634 1.748 13.06 1.5 15.5 1.5A7.5 7.5 0 0121 9c0 2.203-.787 4.228-2.052 5.868a12.06 12.06 0 01-2.657-.879c-.933-.315-1.859-.44-2.783-.379C12.43 14.862 12 16.517 12 18.25c0 .324.015.647.045.968A9 9 0 0012 1.5z" /></svg>'
+
       },
     ]);
 
