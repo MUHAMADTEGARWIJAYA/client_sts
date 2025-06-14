@@ -1,13 +1,12 @@
 <template>
   <div class="min-h-screen bg-[#131010] text-white p-4 md:p-8">
     <header class="mb-10 text-center">
-
       <TambahCoba />
+      <h1 class="text-3xl font-bold text-purple-400 mb-2">SoundTrack Sent</h1>
       <p class="text-lg text-white">Kirim pesan dengan lagu favoritmu</p>
     </header>
 
     <main class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- Search Section -->
       <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/20">
         <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -18,7 +17,7 @@
         </h2>
 
         <div class="relative mb-6">
-          <input v-model="searchQuery" @keyup.enter="searchSongs" type="text" placeholder="Cari lagu atau artist..."
+          <input v-model="searchQuery" type="text" placeholder="Cari lagu atau artist..."
             class="w-full bg-white/20 rounded-full py-3 px-5 pr-12 text-white placeholder-white focus:outline-none focus:ring-2 focus:ring-white" />
           <button @click="searchSongs"
             class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/20 rounded-full p-2 transition">
@@ -43,13 +42,21 @@
               <h3 class="font-medium truncate">{{ song.title }}</h3>
               <p class="text-sm text-purple-200 truncate">{{ song.artist }}</p>
             </div>
-            <button class="p-1 text-purple-200 hover:text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"
-                  clip-rule="evenodd" />
+            <button v-if="selectedSong?.id === song.id"
+              class="p-1 text-white bg-purple-700 rounded-full hover:bg-purple-800">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
             </button>
+            <button v-else-if="song.preview_url" @click.stop="playPreviewFromSearch(song)"
+              class="p-1 text-purple-200 hover:text-white hover:bg-white/20 rounded-full">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+              </svg>
+            </button>
+            <span v-else class="text-purple-200/50 text-xs">No Preview</span>
           </div>
         </div>
 
@@ -58,7 +65,6 @@
         </div>
       </div>
 
-      <!-- Message Form Section -->
       <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/20">
         <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,7 +148,6 @@
       </div>
     </main>
 
-    <!-- Success Notification -->
     <div v-if="showSuccess"
       class="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in-up">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,116 +155,214 @@
       </svg>
       Pesan berhasil dikirim!
     </div>
-
-
   </div>
-
-
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import TambahCoba from './TambahCoba.vue'
-const searchQuery = ref('')
-const searchResults = ref([])
-const isSearching = ref(false)
-const searchError = ref(null)
+import { ref, onMounted, watch } from 'vue';
+import axios from 'axios';
+import TambahCoba from './TambahCoba.vue';
 
-const selectedSong = ref(null)
-const isPlaying = ref(false)
-const audioPlayer = ref(null)
+const searchQuery = ref('');
+const searchResults = ref([]);
+const isSearching = ref(false);
+const searchError = ref(null);
+const searchTimeout = ref(null);
+
+const selectedSong = ref(null);
+const isPlaying = ref(false);
+const audioPlayer = ref(null);
 
 const messageForm = ref({
-
+  from: '',
   to: '',
   pesan: ''
-})
+});
 
-const isSending = ref(false)
-const showSuccess = ref(false)
+const isSending = ref(false);
+const showSuccess = ref(false);
+
+watch(searchQuery, (newQuery) => {
+  if (searchTimeout.value) {
+    clearTimeout(searchTimeout.value);
+  }
+
+  searchTimeout.value = setTimeout(() => {
+    if (newQuery.trim()) {
+      searchSongs();
+    } else {
+      searchResults.value = [];
+    }
+  }, 300);
+});
 
 const searchSongs = async () => {
-  if (!searchQuery.value.trim()) return
+  if (!searchQuery.value.trim()) {
+    searchResults.value = [];
+    return;
+  }
 
-  isSearching.value = true
-  searchError.value = null
+  isSearching.value = true;
+  searchError.value = null;
 
   try {
-    const response = await axios.get(`https://server-sts.vercel.app/song/search?q=${encodeURIComponent(searchQuery.value)}`)
-    searchResults.value = response.data
+    const response = await axios.get(`https://server-sts.vercel.app/song/search?q=${encodeURIComponent(searchQuery.value)}`);
+    searchResults.value = response.data;
   } catch (error) {
-    console.error('Search error:', error)
-    searchError.value = error.response?.data?.msg || 'Gagal mencari lagu'
-    searchResults.value = []
+    console.error('Search error:', error);
+    searchError.value = error.response?.data?.msg || 'Gagal mencari lagu.';
+    searchResults.value = [];
   } finally {
-    isSearching.value = false
+    isSearching.value = false;
   }
-}
+};
 
 const selectSong = (song) => {
-  selectedSong.value = song
-  if (audioPlayer.value) {
-    audioPlayer.value.pause()
-    audioPlayer.value.src = song.preview_url || ''
-    isPlaying.value = false
+  // DEBUGGING: Log saat lagu dipilih
+  console.log('--- Lagu Diklik ---');
+  console.log('Lagu yang diklik:', song);
+
+  // Jika lagu yang diklik adalah lagu yang sama dengan yang sudah terpilih, batalkan pilihan
+  if (selectedSong.value && selectedSong.value.id === song.id) {
+    selectedSong.value = null;
+    if (audioPlayer.value) {
+      audioPlayer.value.pause();
+      isPlaying.value = false;
+      audioPlayer.value.src = '';
+    }
+    console.log('Pilihan lagu dibatalkan.');
+  } else {
+    // Jika lagu yang diklik berbeda, atau belum ada yang terpilih, pilih lagu ini
+    selectedSong.value = song;
+    if (audioPlayer.value) {
+      audioPlayer.value.pause();
+      audioPlayer.value.src = song.preview_url || '';
+      isPlaying.value = false;
+    }
+    console.log('Lagu terpilih:', selectedSong.value);
   }
-}
+};
+
+const playPreviewFromSearch = (song) => {
+  // Hanya jika ada preview URL
+  if (!song.preview_url) {
+    console.log(`Tidak ada preview URL untuk lagu: ${song.title}`);
+    return;
+  }
+
+  // Jika lagu yang sedang diputar adalah lagu ini dan sedang aktif, hentikan
+  if (selectedSong.value?.id === song.id && isPlaying.value) {
+    audioPlayer.value.pause();
+    isPlaying.value = false;
+    console.log(`Preview lagu ${song.title} dihentikan.`);
+  } else {
+    // Pastikan lagu ini yang terpilih untuk diputar preview-nya
+    // Penting: Jangan ubah selectedSong di sini jika tujuan utamanya hanya memutar preview
+    // Jika Anda ingin tombol play di hasil pencarian juga "memilih" lagu, maka logic selectSong bisa digabung.
+    // Untuk saat ini, kita akan fokus pada memutar preview saja tanpa mengubah `selectedSong` dari hasil pencarian
+    // Kecuali jika `selectedSong` memang belum diset dari hasil klik div.
+    if (audioPlayer.value) {
+      audioPlayer.value.src = song.preview_url; // Langsung gunakan preview_url dari song yang di-klik
+      audioPlayer.value.play();
+      isPlaying.value = true;
+      console.log(`Memutar preview lagu: ${song.title}`);
+      // Opsional: set selectedSong jika Anda ingin tombol play juga dianggap sebagai "pemilihan"
+      // selectedSong.value = song;
+    }
+  }
+};
+
 
 const toggleAudio = () => {
-  if (!selectedSong.value?.preview_url || !audioPlayer.value) return
+  if (!selectedSong.value?.preview_url || !audioPlayer.value) {
+    console.log('Tidak ada lagu terpilih atau tidak ada preview URL untuk diputar.');
+    return;
+  }
 
   if (isPlaying.value) {
-    audioPlayer.value.pause()
+    audioPlayer.value.pause();
+    console.log('Preview dihentikan.');
   } else {
-    audioPlayer.value.play()
+    audioPlayer.value.play();
+    console.log('Preview dimainkan.');
   }
-  isPlaying.value = !isPlaying.value
-}
+  isPlaying.value = !isPlaying.value;
+};
 
 const sendMessage = async () => {
-  if (!selectedSong.value) return
+  if (!selectedSong.value) {
+    alert('Harap pilih lagu terlebih dahulu.');
+    console.log('GAGAL KIRIM: selectedSong belum dipilih.');
+    return;
+  }
 
-  isSending.value = true
+  isSending.value = true;
 
   try {
     const payload = {
-      ...messageForm.value,
-      title: selectedSong.value.title
-    }
+      from: messageForm.value.from,
+      to: messageForm.value.to,
+      pesan: messageForm.value.pesan,
+      song_id: selectedSong.value.id, // Ini yang paling penting
+      title: selectedSong.value.title,
+      artist: selectedSong.value.artist,
+      cover: selectedSong.value.cover,
+      spotify_url: selectedSong.value.spotify_url
+    };
 
-    await axios.post('https://server-sts.vercel.app/song/message', payload)
+    // DEBUGGING: Log payload sebelum dikirim
+    console.log('--- Mengirim Pesan ---');
+    console.log('Payload yang akan dikirim:', payload);
+    console.log('selectedSong.value saat ini:', selectedSong.value); // Pastikan ini juga benar
 
-    // Reset form
+    await axios.post('https://server-sts.vercel.app/song/message', payload);
+
     messageForm.value = {
-
+      from: '',
       to: '',
       pesan: ''
+    };
+    selectedSong.value = null;
+    searchResults.value = [];
+    searchQuery.value = '';
+    if (audioPlayer.value) {
+      audioPlayer.value.pause();
+      isPlaying.value = false;
+      audioPlayer.value.src = '';
     }
-    selectedSong.value = null
-    searchResults.value = []
-    searchQuery.value = ''
 
-    showSuccess.value = true
+    showSuccess.value = true;
     setTimeout(() => {
-      showSuccess.value = false
-    }, 3000)
+      showSuccess.value = false;
+    }, 3000);
+    console.log('Pesan berhasil dikirim!');
+
   } catch (error) {
-    console.error('Send message error:', error)
-    alert(error.response?.data?.msg || 'Gagal mengirim pesan')
+    console.error('Send message error:', error);
+    // DEBUGGING: Log error response dari server
+    if (error.response) {
+      console.error('Server Response Error:', error.response.data);
+      console.error('Server Status:', error.response.status);
+    } else if (error.request) {
+      console.error('No response received:', error.request);
+    } else {
+      console.error('Error setting up request:', error.message);
+    }
+    alert(error.response?.data?.msg || 'Gagal mengirim pesan. Pastikan semua kolom terisi dan server berfungsi.');
   } finally {
-    isSending.value = false
+    isSending.value = false;
   }
-}
+};
 
 onMounted(() => {
-  audioPlayer.value = new Audio()
-})
+  if (!audioPlayer.value) {
+    audioPlayer.value = new Audio();
+  }
+});
 </script>
 
-
-
 <style>
+/* CSS Anda tetap sama */
 @keyframes fadeInUp {
   from {
     opacity: 0;
