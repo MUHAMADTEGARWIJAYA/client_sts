@@ -42,7 +42,7 @@
 
       <section class="mb-28">
         <h2 class="text-3xl font-bold text-center mb-16 text-white">
-          <span class="border-b-4 border-cyan-400 pb-2">Say to someone</span>
+          <span class="border-b-4 border-cyan-400 pb-2">Fitur Utama</span>
         </h2>
 
         <div class="grid md:grid-cols-3 gap-8">
@@ -50,52 +50,53 @@
             class="bg-white backdrop-blur-md p-6 rounded-xl transition-all duration-500 hover:-translate-y-2"
             :style="`animation-delay: ${index * 100}ms`">
             <div class="text-cyan-400 mb-4" v-html="feature.icon"></div>
-            <h3 class="text-md mb-2 handwritten text-[#131010]">{{ feature.title }}</h3>
-            <p class="text-[#131010] text-xs">{{ feature.description }}</p>
+            <h3 class="text-xl font-semibold mb-2 text-[#131010]">{{ feature.title }}</h3>
+            <p class="text-[#131010] text-sm">{{ feature.description }}</p>
           </div>
         </div>
       </section>
 
       <section class="mb-20">
+        <h2 class="text-3xl font-bold text-center mb-16 text-white">
+          <span class="border-b-4 border-cyan-400 pb-2">Pesan Terbaru</span>
+        </h2>
 
         <div v-if="loadingMessages" class="flex justify-center py-10">
           <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-400"></div>
         </div>
 
         <div v-else-if="recentMessages && recentMessages.length === 0" class="text-center py-10 text-indigo-300">
-          Belum ada pesan terbaru
+          Belum ada pesan terbaru. Mari jadi yang pertama mengirim!
         </div>
 
-        <div v-else class="relative overflow-hidden py-4  rounded-md ">
-          <div ref="scrollContainerTop" class="flex gap-6 pb-4 overflow-x-hidden snap-x snap-mandatory scroll-smooth">
+        <div v-else class="relative overflow-hidden py-4 rounded-md">
+          <div class="flex gap-6 pb-4 whitespace-nowrap scrolling-container">
             <div v-for="(message, index) in displayedMessagesTop" :key="`top-${message._id}-${index}`"
-              class="flex-shrink-0 w-64 md:w-[400px] bg-white/5 hover:bg-white/10 backdrop-blur-md rounded-xl overflow-hidden transition-all duration-300">
-              <div class="">
-                <div class="bg-white rounded-lg p-6 h-72 flex flex-col justify-between ">
-                  <div class="flex w-full h-16 rounded-lg">
-                    <div class="p-3 flex w-full gap-10">
-                      <img :src="message.cover || 'https://via.placeholder.com/300/1e3a8a/ffffff?text=No+Cover'"
-                        :alt="message.title" class="w-10 h-10 object-cover" />
-                      <div>
-                        <h3 class="font-semibold text-[#131010] ">{{ message.title }}</h3>
-                        <p class="text-xs text-[#131010] ">{{ message.artist || 'Unknown Artist' }}</p>
-                      </div>
+              class="flex-shrink-0 w-64 md:w-[400px] bg-white/5 hover:bg-white/10 backdrop-blur-md rounded-xl overflow-hidden transition-all duration-300 message-card">
+              <div class="bg-white rounded-lg p-6 h-72 flex flex-col justify-between">
+                <div class="flex w-full h-16 rounded-lg">
+                  <div class="p-3 flex w-full gap-4 items-center">
+                    <img :src="message.cover || 'https://via.placeholder.com/300/1e3a8a/ffffff?text=No+Cover'"
+                      :alt="message.title" class="w-10 h-10 object-cover rounded-md" />
+                    <div>
+                      <h3 class="font-semibold text-[#131010] text-base">{{ message.title }}</h3>
+                      <p class="text-xs text-gray-500 ">{{ message.artist || 'Unknown Artist' }}</p>
                     </div>
                   </div>
-                  <p class="text-sm font-medium p-3 text-[#131010] truncate">
-                    To: {{ message.to }}
+                </div>
+                <p class="text-sm font-medium p-3 text-[#131010] truncate">
+                  To: <span class="font-bold">{{ message.to }}</span>
+                </p>
+                <div class="h-56 p-3 pt-4 flex handwritten items-center overflow-hidden">
+                  <p class="text-[#131010] text-3xl line-clamp-2 overflow-hidden leading-tight">
+                    "{{ message.pesan }}"
                   </p>
-                  <div class="h-56 p-3 pt-4 flex handwritten items-center overflow-hidden">
-                    <p class="text-[#131010] text-3xl line-clamp-2 overflow-hidden leading-tight">
-                      {{ message.pesan }}
-                    </p>
-                  </div>
-                  <div class="flex justify-start p-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#1DB954">
-                      <path
-                        d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
-                    </svg>
-                  </div>
+                </div>
+                <div class="flex justify-start p-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#1DB954">
+                    <path
+                      d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+                  </svg>
                 </div>
               </div>
             </div>
@@ -104,63 +105,48 @@
       </section>
 
     </div>
-
-
   </div>
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import axios from 'axios';
-import dayjs from 'dayjs';
+import dayjs from 'dayjs'; // Pastikan dayjs terinstal jika digunakan
 
 export default {
   setup() {
     const loadingMessages = ref(true);
     const recentMessages = ref([]);
 
-    const scrollContainerTop = ref(null);
-    // scrollContainerBottom tidak lagi dibutuhkan karena elemennya dihapus
-    // const scrollContainerBottom = ref(null);
-
-    let scrollIntervalTop = null;
-    // scrollIntervalBottom tidak lagi dibutuhkan
-    // let scrollIntervalBottom = null;
-
-    const scrollSpeed = 0.5;
-    const scrollDelay = 10;
-
     const features = ref([
       {
-        title: 'Send a Message',
-        description: 'Send a heartfelt note to someone special.',
-
+        title: 'Kirim Pesan',
+        description: 'Kirim pesan tulus dengan lagu favoritmu kepada seseorang yang spesial.',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10"><path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0v9l-9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg>'
       },
       {
-        title: 'Search messages',
-        description: 'Kamu bisa menemukan pesan dari seseorang untuk kamu',
-
+        title: 'Cari Pesan',
+        description: 'Kamu bisa menemukan pesan yang ditujukan untukmu dari seseorang yang kamu kenal.',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0M3.75 18H7.5m3-6h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0M3.75 12H7.5" /></svg>'
       },
       {
-        title: 'Share to Social Media',
-        description: 'Tap pada salah satu pesan lalu tap icon share untuk membagikan ke sosial media',
-
+        title: 'Bagikan ke Medsos',
+        description: 'Tap pada salah satu pesan lalu tap ikon share untuk membagikan ke sosial media kesukaanmu.',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186A2.25 2.25 0 015.124 15.15c-.868.23-1.761.52-2.657.879.145.39.297.779.458 1.162A12.067 12.067 0 007.217 21a2.25 2.25 0 100-2.186m0-2.186c1.393 0 2.524-.764 2.524-2.186s-1.131-2.186-2.524-2.186M12 1.5c-3.243 0-6.148 1.458-8.06 3.75c1.413-.574 2.871-.977 4.381-1.218C10.634 1.748 13.06 1.5 15.5 1.5A7.5 7.5 0 0121 9c0 2.203-.787 4.228-2.052 5.868a12.06 12.06 0 01-2.657-.879c-.933-.315-1.859-.44-2.783-.379C12.43 14.862 12 16.517 12 18.25c0 .324.015.647.045.968A9 9 0 0012 1.5z" /></svg>'
       },
     ]);
 
     const formatDate = (dateString) => {
+      // Fungsi ini tidak terpakai di template yang diperbarui, tapi tetap relevan jika ingin menampilkan tanggal
       return dayjs(dateString).format('D MMM');
     };
 
     const displayedMessagesTop = computed(() => {
       if (recentMessages.value.length === 0) return [];
       const messages = [...recentMessages.value];
-      // Duplikasi konten agar bisa di-loop secara mulus
-      return [...messages, ...messages, ...messages, ...messages, ...messages, ...messages];
+      // Duplikasi konten 10x agar animasi loop CSS berjalan mulus tanpa jeda
+      return Array(10).fill(messages).flat();
     });
-
-    // displayedMessagesBottom tidak lagi dibutuhkan
-    // const displayedMessagesBottom = computed(() => { ... });
 
     const fetchRecentMessages = async () => {
       try {
@@ -174,63 +160,13 @@ export default {
       }
     };
 
-    const startScrolling = async () => {
-      stopScrolling(); // Hentikan semua interval yang mungkin sedang berjalan
-
-      await nextTick(); // Tunggu hingga Vue selesai memperbarui DOM
-
-      // Debugging: Cek nilai scrollWidth dan clientWidth
-      console.log('--- Start Scrolling Debug ---');
-      if (scrollContainerTop.value) {
-        console.log('Top scrollWidth:', scrollContainerTop.value.scrollWidth);
-        console.log('Top clientWidth:', scrollContainerTop.value.clientWidth);
-      }
-      console.log('--- End Scrolling Debug ---');
-
-
-      // Logika Scroll untuk Baris Atas (konten bergerak ke kiri / scroll ke kanan)
-      if (scrollContainerTop.value) {
-        scrollContainerTop.value.scrollLeft = 0; // Pastikan posisi awal di 0
-        scrollIntervalTop = setInterval(() => {
-          if (scrollContainerTop.value) { // Cek apakah elemen masih ada
-            scrollContainerTop.value.scrollLeft += scrollSpeed;
-            // Jika sudah melewati setengah dari total lebar scroll (area duplikasi pertama)
-            if (scrollContainerTop.value.scrollLeft >= (scrollContainerTop.value.scrollWidth / 2)) {
-              scrollContainerTop.value.scrollLeft = 0; // Kembali ke awal
-            }
-          } else {
-            // Jika elemen hilang, hentikan interval
-            clearInterval(scrollIntervalTop);
-            scrollIntervalTop = null;
-          }
-        }, scrollDelay);
-      }
-      // Logika untuk scrollContainerBottom sudah dihapus
-    };
-
-    const stopScrolling = () => {
-      if (scrollIntervalTop) {
-        clearInterval(scrollIntervalTop);
-        scrollIntervalTop = null;
-      }
-      // Hentikan juga interval untuk bottom jika sebelumnya ada
-      // if (scrollIntervalBottom) {
-      //   clearInterval(scrollIntervalBottom);
-      //   scrollIntervalBottom = null;
-      // }
-    };
-
     onMounted(async () => {
       await fetchRecentMessages();
-      if (recentMessages.value.length > 0) {
-        setTimeout(() => {
-          startScrolling();
-        }, 100); // Coba delay 100ms
-      }
+      // Tidak perlu lagi memanggil startScrolling() karena kita pakai CSS Animation
     });
 
     onUnmounted(() => {
-      stopScrolling();
+      // Tidak ada lagi interval JavaScript yang perlu dihentikan
     });
 
     return {
@@ -239,9 +175,6 @@ export default {
       displayedMessagesTop,
       features,
       formatDate,
-      scrollContainerTop,
-      // scrollContainerBottom tidak lagi dikembalikan
-      // scrollContainerBottom,
     };
   }
 };
@@ -249,12 +182,13 @@ export default {
 
 <style>
 /* Existing styles remain */
+/* Font kustom untuk tulisan tangan */
 .handwritten {
   font-family: 'Reenie Beanie', cursive;
   font-size: 2rem;
 }
 
-/* Animations */
+/* Base Animations */
 @keyframes fade-in-up {
   from {
     opacity: 0;
@@ -313,7 +247,7 @@ export default {
   animation: spin-slow 20s linear infinite;
 }
 
-/* Line clamp */
+/* Line clamping for message text */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -321,7 +255,7 @@ export default {
   overflow: hidden;
 }
 
-/* Transition */
+/* Transitions for hover effects */
 .transition-all {
   transition-property: all;
 }
@@ -332,5 +266,47 @@ export default {
 
 .duration-500 {
   transition-duration: 500ms;
+}
+
+/* --- Perbaikan Animasi Scroll Horizontal (NEW/MODIFIED) --- */
+
+/* Keyframes untuk animasi scroll tak terbatas ke kiri */
+@keyframes scrollLeft {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    /* Menggulir setengah dari total lebar konten yang diduplikasi */
+    /* Ini penting untuk menciptakan loop yang mulus */
+    transform: translateX(-50%);
+  }
+}
+
+/* Container untuk pesan yang akan di-scroll */
+.scrolling-container {
+  /* Hilangkan properti snap-x, snap-mandatory, dan scroll-smooth */
+  /* Karena animasi CSS yang akan mengendalikan pergerakan */
+  overflow: hidden;
+  /* Penting untuk menyembunyikan bagian konten yang diduplikasi */
+  animation: scrollLeft 300s linear infinite;
+  /* Sesuaikan durasi (60s) untuk kecepatan scroll yang diinginkan */
+  /* 'linear' untuk kecepatan konstan */
+  /* 'infinite' untuk mengulang terus menerus */
+  width: max-content;
+  /* Sangat penting! Memastikan lebar container cukup untuk semua item yang diduplikasi */
+}
+
+/* Opsional: Jeda animasi saat di-hover */
+.scrolling-container:hover {
+  animation-play-state: paused;
+}
+
+/* Pastikan kartu pesan individu tidak mempengaruhi tata letak scroll */
+.message-card {
+  display: inline-block;
+  /* Menjadikan kartu sebagai blok inline agar bisa berjajar horizontal */
+  vertical-align: top;
+  /* Memastikan align top jika ada perbedaan tinggi */
 }
 </style>
