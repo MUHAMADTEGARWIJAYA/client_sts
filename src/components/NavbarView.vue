@@ -24,12 +24,12 @@
         }" class="px-2 py-2 rounded-md text-sm font-medium transition-colors duration-200 md:ml-4">
           Search
         </router-link>
-        <router-link to="/support" :class="{
+        <!-- <router-link to="/support" :class="{
           'text-[#131010] bg-white ': $route.path === '/support',
           'text-indigo-200 hover:text-white': $route.path !== '/support'
         }" class="px-2 py-2 rounded-md text-sm font-medium transition-colors duration-200 md:ml-4">
           Support
-        </router-link>
+        </router-link> -->
       </div>
     </div>
   </nav>
