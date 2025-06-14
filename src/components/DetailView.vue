@@ -36,8 +36,8 @@
 
               <div class="flex items-center gap-4 mb-4">
                 <div>
-                  <p>Halo <span class="font-semibold italic">{{ message.to }}</span>, seseorang mengirimkan lagu ini
-                    bersama pesan tulus — semoga membuat harimu ceria :)</p>
+                  <p>Hello <span class="font-semibold italic">{{ message.to }}</span>, someone sent you this song along
+                    with a heartfelt message — hoping it brings a smile to your day :)</p>
                 </div>
               </div>
 
