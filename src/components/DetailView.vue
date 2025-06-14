@@ -2,15 +2,15 @@
   <div class="min-h-screen bg-white text-black flex items-center justify-center p-4 md:p-8">
     <div v-if="isLoading" class="flex flex-col items-center justify-center">
       <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-black"></div>
-      <p class="mt-4 text-gray-600">Loading message...</p>
+      <p class="mt-4 text-gray-600">Memuat pesan...</p>
     </div>
 
     <div v-else-if="error" class="text-center p-8 bg-gray-100 border border-gray-300 rounded-lg max-w-md mx-auto">
-      <p class="text-gray-800 text-lg mb-2">Error occurred!</p>
+      <p class="text-gray-800 text-lg mb-2">Terjadi kesalahan!</p>
       <p class="text-gray-600">{{ error }}</p>
       <router-link to="/messages"
         class="mt-6 inline-block bg-black text-white font-medium py-2 px-6 rounded hover:bg-gray-800 transition-colors">
-        Back to Messages
+        Kembali ke Pesan
       </router-link>
     </div>
 
@@ -36,16 +36,16 @@
 
               <div class="flex items-center gap-4 mb-4">
                 <div>
-                  <p>Hello <span class="font-semibold italic">{{ message.to }}</span>, someone sent you this song along
-                    with a heartfelt message — hoping it brings a smile to your day :)</p>
+                  <p>Halo <span class="font-semibold italic">{{ message.to }}</span>, seseorang mengirimkan lagu ini
+                    bersama pesan tulus — semoga membuat harimu ceria :)</p>
                 </div>
               </div>
 
               <div class="p-5 rounded mb-6">
-                <p class="text-gray-800 text-2xl leading-relaxed handwritten">{{ message.pesan }}</p>
+                <p class="text-gray-800 text-2xl leading-relaxed handwritten">"{{ message.pesan }}"</p>
               </div>
 
-              <p class="text-xs text-gray-400 text-right">Sent on: {{ formatDate(message.createdAt) }}</p>
+              <p class="text-xs text-gray-400 text-right">Dikirim pada: {{ formatDate(message.createdAt) }}</p>
             </div>
           </div>
         </div>
@@ -53,26 +53,26 @@
       <div class="flex flex-wrap gap-3 mt-6 justify-end mb-10 px-9">
         <a :href="message.spotify_url" target="_blank" rel="noopener noreferrer"
           class="flex items-center gap-2 bg-black text-white py-2 px-5 rounded text-sm font-medium hover:bg-gray-800 transition-colors">
-          <i class="fab fa-spotify"></i> Play on Spotify
+          <i class="fab fa-spotify"></i> Putar di Spotify
         </a>
         <button @click="downloadMessageAsImage"
           class="flex items-center gap-2 bg-gray-100 text-gray-800 py-2 px-5 rounded text-sm font-medium hover:bg-gray-200 transition-colors">
-          <i class="fas fa-download"></i> Download as Image
+          <i class="fas fa-download"></i> Unduh sebagai Gambar
         </button>
 
         <button @click="copyLink"
           class="flex items-center gap-2 bg-gray-100 text-gray-800 py-2 px-5 rounded text-sm font-medium hover:bg-gray-200 transition-colors">
-          <i class="fas fa-link"></i> Copy Link
+          <i class="fas fa-link"></i> Salin Tautan
         </button>
       </div>
     </div>
 
     <div v-else class="text-center p-8 bg-gray-100 border border-gray-300 rounded-lg max-w-md mx-auto">
-      <p class="text-gray-800 text-lg mb-2">Message not found</p>
-      <p class="text-gray-600">The message ID may be invalid or deleted.</p>
+      <p class="text-gray-800 text-lg mb-2">Pesan tidak ditemukan</p>
+      <p class="text-gray-600">ID pesan mungkin tidak valid atau sudah dihapus.</p>
       <router-link to="/messages"
         class="mt-6 inline-block bg-black text-white font-medium py-2 px-6 rounded hover:bg-gray-800 transition-colors">
-        Back to Messages
+        Kembali ke Pesan
       </router-link>
     </div>
   </div>
@@ -83,6 +83,9 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat'; // Plugin untuk ordinal seperti 'th', 'st'
+dayjs.extend(advancedFormat);
+
 import html2canvas from 'html2canvas';
 import { saveAs } from 'file-saver';
 
@@ -102,7 +105,8 @@ export default {
         const response = await axios.get(`https://server-sts.vercel.app/song/message/${messageId}`);
         message.value = response.data.data;
 
-        // Corrected Spotify iframe URL: Get spotify_id from spotify_url
+        // **Penting: Perbaiki URL Spotify Iframe**
+        // Extract spotify_id from spotify_url if available
         if (message.value.spotify_url && !message.value.spotify_id) {
           const spotifyRegex = /(?:spotify:track:|https:\/\/open\.spotify\.com\/track\/)([a-zA-Z0-9]+)/;
           const match = message.value.spotify_url.match(spotifyRegex);
@@ -122,24 +126,22 @@ export default {
 
     const formatDate = (dateString) => {
       if (!dateString) return '';
-      return dayjs(dateString).format('MMMM D, YYYY [at] h:mm A');
+      // Contoh format yang lebih lokal dan mudah dibaca
+      return dayjs(dateString).format('D MMMM YYYY [pukul] HH:mm');
     };
-
-    // Fungsi shareToTwitter dan shareToWhatsApp tidak ada di template HTML Anda,
-    // jadi saya tidak menyertakannya lagi di sini untuk menjaga konsistensi.
-    // Jika Anda ingin menggunakannya, tambahkan kembali tombolnya di template.
 
     const copyLink = async () => {
       try {
         await navigator.clipboard.writeText(window.location.href);
-        alert('Link berhasil disalin ke clipboard!');
+        alert('Tautan berhasil disalin ke clipboard!');
       } catch (err) {
-        console.error('Failed to copy link:', err);
-        alert('Gagal menyalin link.');
+        console.error('Gagal menyalin tautan:', err);
+        alert('Gagal menyalin tautan.');
       }
     };
 
     const downloadMessageAsImage = async () => {
+      // 1. Dapatkan elemen konten yang sedang terlihat di layar.
       const visibleContent = document.getElementById('message-content-visible');
 
       if (!visibleContent) {
@@ -148,47 +150,56 @@ export default {
         return;
       }
 
-      // 1. Buat klon dari elemen konten yang terlihat
+      // 2. Buat kloning dari elemen yang terlihat.
       const clonedContent = visibleContent.cloneNode(true);
 
-      // 2. Tentukan lebar tetap untuk klon (misalnya, lebar desktop yang Anda inginkan)
-      //    Ini akan membuat html2canvas merender pada lebar ini, terlepas dari viewport
-      const targetWidth = 800; // Lebar standar yang diinginkan untuk gambar (sesuaikan)
-      clonedContent.style.width = `${targetWidth}px`;
-      clonedContent.style.maxWidth = `${targetWidth}px`; // Pastikan tidak melebihi
+      // 3. Tentukan lebar target untuk kloningan. Ini akan menjadi lebar gambar yang dihasilkan.
+      //    Pilih lebar yang Anda inginkan untuk tampilan desktop (misalnya 800px atau 1024px).
+      const targetWidth = 800; // Lebar ideal yang Anda inginkan untuk gambar
 
-      // 3. Atur posisi klon di luar layar agar tidak terlihat pengguna
+      // 4. Atur properti CSS pada kloningan agar merender pada lebar target.
+      clonedContent.style.width = `${targetWidth}px`;
+      clonedContent.style.maxWidth = `${targetWidth}px`; // Penting untuk responsivitas internal kloning
+      clonedContent.style.boxSizing = 'border-box'; // Pastikan padding/border dihitung dalam lebar
+
+      // 5. Posisikan kloningan di luar viewport agar tidak terlihat oleh pengguna.
       clonedContent.style.position = 'absolute';
       clonedContent.style.top = '-9999px';
       clonedContent.style.left = '-9999px';
-      clonedContent.style.background = '#ffffff'; // Pastikan background putih
+      clonedContent.style.zIndex = '-1'; // Pastikan di belakang semua elemen
+      clonedContent.style.background = '#ffffff'; // Atur warna latar belakang yang jelas
+      clonedContent.style.padding = '32px'; // Tambahkan padding agar gambar tidak terlalu mepet
 
-      // 4. Tambahkan klon ke body atau elemen induk lainnya
+      // Opsional: Jika ada elemen flexbox/grid yang berperilaku berbeda, Anda mungkin perlu menyesuaikan.
+      // Contoh: Untuk memastikan flexbox tetap horizontal di kloningan jika di HP jadi vertikal
+      clonedContent.querySelector('.md\\:flex-row')?.classList.remove('flex-col');
+      clonedContent.querySelector('.md\\:flex-row')?.classList.add('flex-row');
+
+      // 6. Tambahkan kloningan ke DOM sementara waktu.
       document.body.appendChild(clonedContent);
 
       try {
-        // 5. Render klon menggunakan html2canvas
+        // 7. Render kloningan menggunakan html2canvas.
         const canvas = await html2canvas(clonedContent, {
-          scale: 2, // Meningkatkan skala untuk resolusi gambar yang lebih baik (misal 2x atau 3x)
+          scale: 2, // Tingkatkan skala (misal 2x atau 3x) untuk resolusi gambar yang lebih baik
           useCORS: true, // Penting untuk memuat gambar dari domain berbeda (misal cover Spotify)
-          backgroundColor: '#ffffff', // Atur warna latar belakang kanvas
+          backgroundColor: null, // Biarkan null agar background dari clonedContent dipakai
         });
 
-        // 6. Konversi kanvas ke URL data (format PNG)
+        // 8. Konversi kanvas ke URL data (format PNG).
         const imageDataUrl = canvas.toDataURL('image/png');
 
-        // 7. Gunakan file-saver untuk mengunduh gambar
-        saveAs(imageDataUrl, `song-message-${message.value.title.replace(/\s/g, '-')}.png`);
+        // 9. Gunakan file-saver untuk mengunduh gambar.
+        saveAs(imageDataUrl, `pesan-lagu-${message.value.title.replace(/\s/g, '-')}.png`);
 
       } catch (err) {
-        console.error('Error downloading message as image:', err);
+        console.error('Gagal mengunduh pesan sebagai gambar:', err);
         alert('Gagal mengunduh pesan sebagai gambar. Silakan coba lagi.');
       } finally {
-        // 8. Hapus klon dari DOM setelah selesai
+        // 10. Hapus kloningan dari DOM setelah selesai.
         document.body.removeChild(clonedContent);
       }
     };
-
 
     onMounted(() => {
       fetchMessage();
@@ -209,7 +220,6 @@ export default {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Reenie+Beanie&display=swap');
-
 
 /* Minimalist scrollbar */
 ::-webkit-scrollbar {
